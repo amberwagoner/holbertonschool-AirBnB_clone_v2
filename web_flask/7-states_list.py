@@ -1,25 +1,31 @@
 #!/usr/bin/python3
-""" Starts a Flask web application """
-
-from models import storage
+"""
+Script that starts a Flask web application listening on 0.0.0.0:5000
+"""
 from flask import Flask, render_template
+from models import storage
 from models.state import State
+
 
 app = Flask(__name__)
 
 
-@app.route('/states_list', strict_slashes=False)
-def states_list():
-    """Display HTML page with list of all State objects in DBStorage by name"""
-    states = sorted(storage.all(State).values(), key=lambda x: x.name)
-    return render_template('7-states_list.html', states=states)
+@app.route("/states_list", strict_slashes=False)
+def state_list():
+    """
+    Displays an HTML formatted list of states from DBStorage
+    """
+    states = storage.all(State)
+    return render_template("7-states_list.html", state_list=states)
 
 
 @app.teardown_appcontext
-def teardown_session(exception=None):
-    """Closes the database again at the end of the request."""
+def teardown(stuff):
+    """
+    Remove current SQLAlchemy session
+    """
     storage.close()
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='5000')
+    app.run(host="0.0.0.0", port=5000)
